@@ -1,7 +1,7 @@
 # NextEvent
 
 Next event, right in the bar — native to your Omarchy shell. Shows the next
-upcoming event from your calendar with live countdowns and lets you join Google Meet and Zoom calls with a single click.
+upcoming event from your calendar with live countdowns and lets you join Google Meet, Zoom, Teams and Webex calls with a single click.
 
 <p align="center">
   <img src="preview.png" alt="NextEvent Overview" width="560">
@@ -24,8 +24,8 @@ upcoming event from your calendar with live countdowns and lets you join Google 
 - **Theme Aware**: Fully syncs with your active Omarchy theme (colors, typography, borders, and corner rounding adapt automatically)
 - **Universal Calendar Support**: Works with standard `.ics` feeds from Google Calendar, Microsoft Outlook, Apple iCloud, Nextcloud, Proton, and custom URLs
 - **Bar Widget**: Shows the next event with live countdown (`Daily in 15 min`, `Daily · 15 min left`, `Daily · 14:00`, `Daily · Tmrw 14:00`, `Daily · Wed 14:00`)
-- **Meet & Zoom**: Detects Google Meet and Zoom links in an event and labels the next-meeting card with the provider it found
-- **Quick Join**: Click to open the agenda panel; single click on "Join Meeting" opens the Google Meet or Zoom link in your default browser
+- **Video Providers**: Detects Google Meet, Zoom, Microsoft Teams and Webex links in an event and labels the next-meeting card with the provider it found
+- **Quick Join**: Click to open the agenda panel; single click on "Join Meeting" opens the meeting link in your default browser
 - **Instant Actions**: Right-click on the bar widget to join the next meeting immediately; middle-click to force-refresh
 - **Repeating Events**: Automatically expands repeating events (daily standups, weekly meetings) and respects cancelled or rescheduled instances
 - **Live Updates**: Automatic background sync every few minutes, with a 30-second reactive countdown timer
@@ -60,16 +60,20 @@ NextEvent supports any standard **RFC 5545 iCalendar (`.ics`)** feed:
 ## Supported Meeting Links
 
 Video links are picked up from an event's `LOCATION`, `DESCRIPTION`, `CONFERENCE`
-(RFC 7986) and `X-GOOGLE-CONFERENCE` properties:
+(RFC 7986), `X-GOOGLE-CONFERENCE` and `X-MICROSOFT-SKYPETEAMSMEETINGURL`
+properties:
 
 | Provider | Matched links |
 | -------- | ------------- |
 | **Google Meet** | `meet.google.com/…` |
 | **Zoom** | Meetings (`/j/`), webinars (`/w/`, `/s/`) and personal rooms (`/my/`) on `zoom.us` or `zoomgov.com`, including vanity subdomains such as `us02web.` or `<company>.` |
+| **Microsoft Teams** | `teams.microsoft.com/l/meetup-join/…`, personal meetings on `teams.live.com/meet/…`, and government tenants on `*.teams.microsoft.us` |
+| **Webex** | Personal rooms (`/meet/`, `/join/`) and hosted-site links (`<company>.webex.com/<site>/j.php?MTID=…`) |
 
-Links open in your default browser (or `browserCommand`), so Zoom hands off to
-the desktop client through its usual launch page. When an event carries both a
-Meet and a Zoom link, Meet wins.
+Links open in your default browser (or `browserCommand`), so Zoom and Teams hand
+off to their desktop clients through the usual launch page. When an event
+carries links for more than one provider, the first match in the order above
+wins.
 
 ## Configure
 

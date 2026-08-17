@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "author": "tobiasz-p",
   "license": "MIT",
-  "description": "Next event in the bar — Google Calendar feed, click to join Google Meet or Zoom.",
+  "description": "Next event in the bar — Google Calendar feed, click to join Meet, Zoom, Teams or Webex.",
   "kinds": [
     "bar-widget"
   ],
@@ -14,7 +14,7 @@
   },
   "barWidget": {
     "displayName": "NextEvent",
-    "description": "Shows the next upcoming event (e.g. \"Daily in 15 min\") and joins Google Meet and Zoom calls",
+    "description": "Shows the next upcoming event (e.g. \"Daily in 15 min\") and joins Meet, Zoom, Teams and Webex calls",
     "category": "Productivity",
     "allowMultiple": false,
     "defaultSection": "right"

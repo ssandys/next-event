@@ -426,6 +426,29 @@ var MEETING_PROVIDERS = [
     // brackets keeps a `?pwd=…` query intact while shedding the surrounding
     // markup when a description holds HTML.
     pattern: /https:\/\/(?:[a-z0-9-]+\.)*(?:zoom\.us|zoomgov\.com)\/(?:j|w|s|my)\/[^\s"'<>]+/i
+  },
+  {
+    provider: "teams",
+    label: "Teams",
+    // Commercial, personal (teams.live.com) and government (GCC High / DoD,
+    // which subdomain teams.microsoft.us) tenants.
+    //
+    // The path is restricted rather than open, and that is load-bearing: an
+    // Outlook invite body also links teams.microsoft.com/meetingOptions/… a
+    // few lines below the join link, so a domain-only match would join the
+    // wrong URL. Outlook wraps the real link in angle brackets — "Click here
+    // to join the meeting<https://…>" — which the shared boundary class below
+    // already terminates on.
+    pattern: /https:\/\/(?:teams\.microsoft\.com|teams\.live\.com|(?:[a-z0-9-]+\.)?teams\.microsoft\.us)\/(?:l\/meetup-join|l\/meeting|meet)\/[^\s"'<>]+/i
+  },
+  {
+    provider: "webex",
+    label: "Webex",
+    // Personal rooms (/meet/, /join/) and the hosted-site form,
+    // <company>.webex.com/<site>/j.php?MTID=…. Path-restricted for the same
+    // reason as Teams: bare webex.com links in a signature are not meetings.
+    // Not covered: the /webappng/sites/… deep links, which rarely reach a feed.
+    pattern: /https:\/\/(?:[a-z0-9-]+\.)*webex\.com\/(?:meet\/|join\/|[^\s"'<>]*j\.php\?)[^\s"'<>]+/i
   }
 ]
 
@@ -499,7 +522,10 @@ function parseEventBlock(block) {
     else if (name === "RRULE") ev.rrule = parseRRule(value)
     else if (name === "LOCATION") ev.location = unescapeIcs(value)
     else if (name === "DESCRIPTION") ev.description = unescapeIcs(value)
-    else if (name === "X-GOOGLE-CONFERENCE") ev.xConference = value.trim()
+    // Vendor properties carrying a join link directly. Outlook/Exchange emits
+    // the Teams one, which beats scraping it back out of the description.
+    else if (name === "X-GOOGLE-CONFERENCE" || name === "X-MICROSOFT-SKYPETEAMSMEETINGURL")
+      ev.xConference = (ev.xConference ? ev.xConference + " " : "") + value.trim()
     // RFC 7986 CONFERENCE — where Outlook, Nextcloud and other non-Google
     // feeds put the join link. An event may carry several (video, phone).
     else if (name === "CONFERENCE") ev.conference = (ev.conference ? ev.conference + " " : "") + value.trim()
