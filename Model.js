@@ -409,15 +409,54 @@ function expandOccurrences(startKey, tzInfo, rule, fromKey, lookaheadDays, maxOc
 
 // --- event block parsing ---------------------------------------------------
 
-function findMeetUrl(text) {
-  var m = /https:\/\/meet\.google\.com\/[a-z0-9][a-z0-9-]*/.exec(String(text || ""))
-  return m ? m[0] : null
+// Video-call providers in priority order: an event carrying links for more
+// than one provider resolves to the first entry that matches.
+var MEETING_PROVIDERS = [
+  {
+    provider: "meet",
+    label: "Meet",
+    pattern: /https:\/\/meet\.google\.com\/[a-z0-9][a-z0-9-]*/
+  },
+  {
+    provider: "zoom",
+    label: "Zoom",
+    // Covers vanity subdomains (us02web., <company>.), /j/ meetings, /w/ and
+    // /s/ webinars and /my/ personal rooms, on both the commercial domain and
+    // Zoom for Government. Stopping the body at whitespace, quotes and angle
+    // brackets keeps a `?pwd=…` query intact while shedding the surrounding
+    // markup when a description holds HTML.
+    pattern: /https:\/\/(?:[a-z0-9-]+\.)*(?:zoom\.us|zoomgov\.com)\/(?:j|w|s|my)\/[^\s"'<>]+/i
+  }
+]
+
+// Sentence punctuation trailing a URL belongs to the prose, not the link.
+function trimUrlPunctuation(url) {
+  return String(url || "").replace(/[.,;:!?)\]]+$/, "")
+}
+
+function findMeetingUrl(text) {
+  var s = String(text || "")
+  for (var i = 0; i < MEETING_PROVIDERS.length; i++) {
+    var m = MEETING_PROVIDERS[i].pattern.exec(s)
+    if (!m) continue
+    return { url: trimUrlPunctuation(m[0]), provider: MEETING_PROVIDERS[i].provider }
+  }
+  return null
+}
+
+// Short display name for the provider badge; unknown/absent falls back to a
+// neutral word so the badge never renders empty.
+function providerLabel(provider) {
+  for (var i = 0; i < MEETING_PROVIDERS.length; i++) {
+    if (MEETING_PROVIDERS[i].provider === provider) return MEETING_PROVIDERS[i].label
+  }
+  return "Meeting"
 }
 
 function parseEventBlock(block) {
   var ev = {
     uid: null, title: "", start: null, end: null, allDay: false, tzid: null,
-    meetUrl: null, rrule: null, exdates: [],
+    meetUrl: null, provider: null, rrule: null, exdates: [],
     durationMs: 0, startKey: 0, tzInfo: null
   }
   var lines = block.lines
@@ -461,6 +500,9 @@ function parseEventBlock(block) {
     else if (name === "LOCATION") ev.location = unescapeIcs(value)
     else if (name === "DESCRIPTION") ev.description = unescapeIcs(value)
     else if (name === "X-GOOGLE-CONFERENCE") ev.xConference = value.trim()
+    // RFC 7986 CONFERENCE — where Outlook, Nextcloud and other non-Google
+    // feeds put the join link. An event may carry several (video, phone).
+    else if (name === "CONFERENCE") ev.conference = (ev.conference ? ev.conference + " " : "") + value.trim()
     else if (name === "EXDATE") {
       var parts = value.split(",")
       for (var j = 0; j < parts.length; j++) {
@@ -472,7 +514,15 @@ function parseEventBlock(block) {
 
   if (!ev.uid || !ev.start) return null
 
-  ev.meetUrl = findMeetUrl((ev.location || "") + " " + (ev.description || "") + " " + (ev.xConference || ""))
+  // Description last: it is the noisiest field, so the dedicated conference
+  // properties get first crack at supplying the link.
+  var found = findMeetingUrl(
+    (ev.location || "") + " " +
+    (ev.conference || "") + " " +
+    (ev.xConference || "") + " " +
+    (ev.description || ""))
+  ev.meetUrl = found ? found.url : null
+  ev.provider = found ? found.provider : null
   if (ev.end && ev.end.getTime() > ev.start.getTime()) {
     ev.durationMs = ev.end.getTime() - ev.start.getTime()
   } else {
@@ -558,6 +608,7 @@ function parseIcs(raw, options) {
         end: endDate,
         allDay: src.allDay === true,
         meetUrl: src.meetUrl || null,
+        provider: src.provider || null,
         location: src.location || "",
         description: src.description || ""
       })
@@ -802,6 +853,8 @@ if (typeof module !== "undefined" && module.exports) {
     parseRfcDate: parseRfcDate,
     parseRRule: parseRRule,
     parseIcs: parseIcs,
+    findMeetingUrl: findMeetingUrl,
+    providerLabel: providerLabel,
     formatLabel: formatLabel,
     formatDuration: formatDuration,
     formatUpdated: formatUpdated,

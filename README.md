@@ -1,7 +1,7 @@
 # NextEvent
 
 Next event, right in the bar — native to your Omarchy shell. Shows the next
-upcoming event from your calendar with live countdowns and lets you join Google Meet calls with a single click.
+upcoming event from your calendar with live countdowns and lets you join Google Meet and Zoom calls with a single click.
 
 <p align="center">
   <img src="preview.png" alt="NextEvent Overview" width="560">
@@ -24,7 +24,8 @@ upcoming event from your calendar with live countdowns and lets you join Google 
 - **Theme Aware**: Fully syncs with your active Omarchy theme (colors, typography, borders, and corner rounding adapt automatically)
 - **Universal Calendar Support**: Works with standard `.ics` feeds from Google Calendar, Microsoft Outlook, Apple iCloud, Nextcloud, Proton, and custom URLs
 - **Bar Widget**: Shows the next event with live countdown (`Daily in 15 min`, `Daily · 15 min left`, `Daily · 14:00`, `Daily · Tmrw 14:00`, `Daily · Wed 14:00`)
-- **Quick Join**: Click to open the agenda panel; single click on "Join Meeting" opens the Google Meet link in your default browser
+- **Meet & Zoom**: Detects Google Meet and Zoom links in an event and labels the next-meeting card with the provider it found
+- **Quick Join**: Click to open the agenda panel; single click on "Join Meeting" opens the Google Meet or Zoom link in your default browser
 - **Instant Actions**: Right-click on the bar widget to join the next meeting immediately; middle-click to force-refresh
 - **Repeating Events**: Automatically expands repeating events (daily standups, weekly meetings) and respects cancelled or rescheduled instances
 - **Live Updates**: Automatic background sync every few minutes, with a 30-second reactive countdown timer
@@ -56,6 +57,20 @@ NextEvent supports any standard **RFC 5545 iCalendar (`.ics`)** feed:
 - **Nextcloud / Fastmail / Proton Calendar / CalDAV exports**
 - **Custom / Local `.ics` URLs**
 
+## Supported Meeting Links
+
+Video links are picked up from an event's `LOCATION`, `DESCRIPTION`, `CONFERENCE`
+(RFC 7986) and `X-GOOGLE-CONFERENCE` properties:
+
+| Provider | Matched links |
+| -------- | ------------- |
+| **Google Meet** | `meet.google.com/…` |
+| **Zoom** | Meetings (`/j/`), webinars (`/w/`, `/s/`) and personal rooms (`/my/`) on `zoom.us` or `zoomgov.com`, including vanity subdomains such as `us02web.` or `<company>.` |
+
+Links open in your default browser (or `browserCommand`), so Zoom hands off to
+the desktop client through its usual launch page. When an event carries both a
+Meet and a Zoom link, Meet wins.
+
 ## Configure
 
 Set your calendar feed URL on the widget:
@@ -82,7 +97,7 @@ Available settings (`omarchy bar set <widget> <key> <value>`):
 | `showDaysAhead`       | `3`     | How many days ahead to list meetings                |
 | `maxTitleLength`      | `28`    | Bar label truncation length                         |
 | `showOnlyWithVideoLink` | `true` | Only show meetings that have a video link          |
-| `browserCommand`      | `""`    | Command used to open the Meet URL (`xdg-open` by default) |
+| `browserCommand`      | `""`    | Command used to open the meeting URL (`xdg-open` by default) |
 | `calendarUrlBase`     | `"https://calendar.google.com/calendar"` | Base URL for "Open in Calendar" (opens `/r` route; set e.g. `https://calendar.google.com/calendar/u/1` for multi-account) |
 
 ## Privacy
