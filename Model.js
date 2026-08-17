@@ -449,6 +449,13 @@ var MEETING_PROVIDERS = [
     // reason as Teams: bare webex.com links in a signature are not meetings.
     // Not covered: the /webappng/sites/… deep links, which rarely reach a feed.
     pattern: /https:\/\/(?:[a-z0-9-]+\.)*webex\.com\/(?:meet\/|join\/|[^\s"'<>]*j\.php\?)[^\s"'<>]+/i
+  },
+  {
+    provider: "goto",
+    label: "GoTo",
+    // meet.goto.com and gotomeet.me host nothing but meetings, so any path
+    // will do. gotomeeting.com also serves marketing pages, hence /join/.
+    pattern: /https:\/\/(?:(?:meet\.goto\.com|(?:www\.)?gotomeet\.me)\/[^\s"'<>]+|(?:[a-z0-9-]+\.)*gotomeeting\.com\/join\/[^\s"'<>]+)/i
   }
 ]
 

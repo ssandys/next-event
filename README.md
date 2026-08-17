@@ -1,7 +1,7 @@
 # NextEvent
 
 Next event, right in the bar — native to your Omarchy shell. Shows the next
-upcoming event from your calendar with live countdowns and lets you join Google Meet, Zoom, Teams and Webex calls with a single click.
+upcoming event from your calendar with live countdowns and lets you join Google Meet, Zoom, Teams, Webex and GoTo calls with a single click.
 
 <p align="center">
   <img src="preview.png" alt="NextEvent Overview" width="560">
@@ -24,7 +24,7 @@ upcoming event from your calendar with live countdowns and lets you join Google 
 - **Theme Aware**: Fully syncs with your active Omarchy theme (colors, typography, borders, and corner rounding adapt automatically)
 - **Universal Calendar Support**: Works with standard `.ics` feeds from Google Calendar, Microsoft Outlook, Apple iCloud, Nextcloud, Proton, and custom URLs
 - **Bar Widget**: Shows the next event with live countdown (`Daily in 15 min`, `Daily · 15 min left`, `Daily · 14:00`, `Daily · Tmrw 14:00`, `Daily · Wed 14:00`)
-- **Video Providers**: Detects Google Meet, Zoom, Microsoft Teams and Webex links in an event and labels the next-meeting card with the provider it found
+- **Video Providers**: Detects Google Meet, Zoom, Microsoft Teams, Webex and GoTo links in an event and labels the next-meeting card with the provider it found
 - **Quick Join**: Click to open the agenda panel; single click on "Join Meeting" opens the meeting link in your default browser
 - **Instant Actions**: Right-click on the bar widget to join the next meeting immediately; middle-click to force-refresh
 - **Repeating Events**: Automatically expands repeating events (daily standups, weekly meetings) and respects cancelled or rescheduled instances
@@ -67,8 +67,9 @@ properties:
 | -------- | ------------- |
 | **Google Meet** | `meet.google.com/…` |
 | **Zoom** | Meetings (`/j/`), webinars (`/w/`, `/s/`) and personal rooms (`/my/`) on `zoom.us` or `zoomgov.com`, including vanity subdomains such as `us02web.` or `<company>.` |
-| **Microsoft Teams** | `teams.microsoft.com/l/meetup-join/…`, personal meetings on `teams.live.com/meet/…`, and government tenants on `*.teams.microsoft.us` |
+| **Microsoft Teams** | Short join links (`teams.microsoft.com/meet/…?p=…`) and the longer `l/meetup-join` form, personal meetings on `teams.live.com/meet/…`, and government tenants on `*.teams.microsoft.us` |
 | **Webex** | Personal rooms (`/meet/`, `/join/`) and hosted-site links (`<company>.webex.com/<site>/j.php?MTID=…`) |
+| **GoTo** | `meet.goto.com/…`, `gotomeet.me/…` personal rooms, and the legacy `gotomeeting.com/join/…` form |
 
 Links open in your default browser (or `browserCommand`), so Zoom and Teams hand
 off to their desktop clients through the usual launch page. When an event
